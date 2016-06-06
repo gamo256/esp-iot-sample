@@ -1,0 +1,36 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>dweet test</title>
+<script src="http://dweet.io/client/dweet.io.min.js"></script>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script>
+  $(function(){
+    var thingName = "esp-led-onoff";  //thing nameの設定
+    // データの送信
+    function publish(action) {
+      dweetio.dweet_for(
+        thingName,
+        {'action' : action},
+        function(err, dweet){
+          console.log(dweet.content);
+        }
+      );
+    }
+  // [ON]ボタンのクリックで文字列「on」を送信
+    $('#on-button').click(function(){
+      publish('on');
+    });
+    // [OFF]ボタンのクリックで文字列「off」を送信
+    $('#off-button').click(function(){
+      publish('off');
+    });
+  });
+</script>
+</head>
+<body>
+  <button id="on-button">ON</button>
+  <button id="off-button">OFF</button>
+</body>
+</html>

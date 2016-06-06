@@ -1,0 +1,85 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>温湿度</title>
+  <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+  <script src="http://dweet.io/client/dweet.io.min.js"></script>
+
+  <style>
+    .box{
+    float: left;
+    width: 200px;
+    }
+  </style>
+
+</head>
+<body>
+  <div>
+    <button onclick="subscribe()">接続</button>
+    <button onclick="unsubscribe()">切断</button>
+  </div>
+  <div>
+    <div class='box' id="temperatureGauge"></div>
+    <div class='box' id="humidityGauge"></div>
+  </div>
+
+  <script type="text/javascript">
+    var thingName = "dweet_esp_dht" // thing Nameの設定	
+    // Google Chart
+    google.load("visualization", "1", {packages:["gauge", "line","corechart"]});
+    google.setOnLoadCallback(drawChart);
+    function drawChart() {
+
+      // Temp for temperature Gauge
+      Temp = google.visualization.arrayToDataTable([
+        ['Label', 'Value'],
+        ['Temperature', 0],
+      ]);
+
+      // Option for temperature Gauge
+      Options = {
+        width: 200, height: 200,
+        min: 0, max: 80,
+        redFrom: 60, redTo: 80,
+        yellowFrom:40, yellowTo: 60,
+        minorTicks: 5
+      };
+      TemperatureGauge = new google.visualization.Gauge(document.getElementById('temperatureGauge'));
+      TemperatureGauge.draw(Temp, Options);
+
+      // Humidity for Humidity Gauge
+      Humidity = google.visualization.arrayToDataTable([
+        ['Label', 'Value'],
+        ['Humidity', 0],
+      ]);
+
+      // Option for humidity Gauge
+      HumOptions = {
+        width: 200, height: 200,
+        min: 0, max: 100,
+      };
+      HumidityGauge = new google.visualization.Gauge(document.getElementById('humidityGauge'));
+      HumidityGauge.draw(Humidity, HumOptions);
+    };
+    function subscribe() {
+      dweetio.listen_for(thingName, function(dweet){
+        console.log(dweet.content.temperature)
+        // Update temperature data
+        Temp.setValue(0, 1, dweet.content.temperature);
+        TemperatureGauge.draw(Temp, Options);
+        // Update humidity data
+        Humidity.setValue(0, 1, dweet.content.humidity);
+        HumidityGauge.draw(Humidity, HumOptions);
+      });
+    }
+    function unsubscribe(){
+      dweetio.stop_listening_for(thingName);
+      Temp.setValue(0, 1, 0);
+      TemperatureGauge.draw(Temp, Options);
+      Humidity.setValue(0, 1, 0);
+      HumidityGauge.draw(Humidity, HumOptions);
+    }
+  </script>
+</body>
+</html>
